@@ -1,6 +1,7 @@
 package sdf;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Point2D;
@@ -19,13 +20,14 @@ public class Actor implements Paintable{
     ArrayList<Actor> dstActors;
     ArrayList<Fleche> fleches;
     
-    int largeur = 20;
-    final int longueur = 20;
-    int x=20,y=20;
+    int largeur = 40;
+    final int longueur = 40;
+    int x=100,y=100;
+    int fontSize=12;
     public Actor(Element actor) throws DataConversionException
     {
         nom = actor.getAttributeValue("name");
-        largeur += nom.length()*6;
+        largeur += nom.length()*fontSize/2;
         ports = new HashMap<>();
         fleches = new ArrayList<>();
         for(Element port:actor.getChildren("port"))
@@ -61,6 +63,7 @@ public class Actor implements Paintable{
     }
     @Override
     public void paint(JComponent parent, Graphics2D g2d) {
+        g2d.setFont(new Font("Tahoma", 1, fontSize));
         g2d.setColor(Color.PINK);
         g2d.fill3DRect(x, y, largeur, longueur, true);
         g2d.setColor(Color.BLACK);

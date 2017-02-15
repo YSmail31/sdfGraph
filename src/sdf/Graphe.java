@@ -1,5 +1,6 @@
 package sdf;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
@@ -30,10 +31,12 @@ public class Graphe extends JPanel {
     private List<Relation> relationships;
     private HashMap<String,Actor> actors;
     private Element racine;
-
+    final int longueur = 40;
+    final int ecart = 40;
     public Graphe(String nomF) {
         relationships = new ArrayList<>();
         ouvrir(nomF);
+        setPreferredSize(new Dimension(200+(longueur+ecart)*actors.size(), H));
         relation();
         this.addMouseListener(new MouseAdapter() {
             @Override
@@ -121,9 +124,24 @@ public class Graphe extends JPanel {
             Point2D p1 = new Point2D.Double(pos[0], pos[1]);
             Point2D p2 = new Point2D.Double(pos[2], pos[3]);
             if(!c1.equals(c2))
+            {
+                int posStr[]=calculPosString(c1,c2);
                 g2.draw(new Line2D.Double(p1, p2));
+                g2.drawString(relationship.getRateSrc(), posStr[0], posStr[1]);
+                g2.drawString(relationship.getRateDst(), posStr[2], posStr[3]);
+            }
             else
+            {
+                int ecartX=6,ecartY=6;
+                int res[]=new int[4];
+                res[0]=c1.x+c1.largeur*3/4;
+                res[1]=c1.y-ecartY;
+                res[2]=c1.x+c1.largeur+ecartX;
+                res[3]=c1.y+c1.longueur/2-ecartY;
                 g2.drawRect(c1.x+c1.largeur*3/4, c1.y-c1.longueur/2,c1.largeur/2+12 , c1.longueur);
+                g2.drawString(relationship.getRateSrc(), res[0], res[1]);
+                g2.drawString(relationship.getRateDst(), res[2], res[3]);
+            }
         }
     }
     private void dessiner(Graphics2D g2) {
@@ -147,7 +165,7 @@ public class Graphe extends JPanel {
                 {
                     int size = actors.size();
                     act.setX(act.x+((act.largeur+120)*(size%2)));
-                    act.setY(act.y+((act.longueur+40)*(size/2)));
+                    act.setY(act.y+((act.longueur+ecart)*(size/2)));
                 }
                 actors.put(act.getNom(),act);
             }
@@ -168,9 +186,49 @@ public class Graphe extends JPanel {
         {
             Actor actSrc=actors.get(channel.getAttributeValue("srcActor"));
             Actor actDst=actors.get(channel.getAttributeValue("dstActor"));
+            String rateSrc=actSrc.getPorts().get(channel.getAttributeValue("srcPort")).getRate()+"";
+            String rateDst=actDst.getPorts().get(channel.getAttributeValue("dstPort")).getRate()+"";
             //actDst.addRelatedActor(actSrc);
             actSrc.addRelatedActor(actDst);
-            relationships.add(new Relation(actSrc, actDst));
+            relationships.add(new Relation(actSrc, actDst, rateSrc, rateDst));
         }
+    }
+
+    private int[] calculPosString(Actor c1, Actor c2) {
+        int res[]=new int[4];
+        int pos = c1.calculPos(c2);
+        int aux[]=getPos(c1,pos);
+        res[0]=aux[0];
+        res[1]=aux[1];
+        pos=c2.calculPos(c1);
+        aux=getPos(c2, pos);
+        res[2]=aux[0];
+        res[3]=aux[1];
+        return res;
+    }
+
+    private int[] getPos(Actor c1, int pos) {
+        int ecartX=10,ecartY=10;
+        int res[]=new int[2];
+        switch(pos)
+        {
+            case 1:
+                res[0]=c1.x+c1.largeur/2-3*ecartX/2;
+                res[1]=c1.y-ecartY;
+                return res;
+            case 2:
+                res[0]=c1.x+c1.largeur+ecartX;
+                res[1]=c1.y+c1.longueur/2+ecartY;
+                return res;
+            case 3:
+                res[0]=c1.x+c1.largeur/2+ecartX;
+                res[1]=c1.y+c1.longueur+2*ecartY;
+                return res;
+            case 4:
+                res[0]=c1.x-2*ecartX;
+                res[1]=c1.y+c1.longueur/2-ecartY;
+                return res;
+        }
+        return null;
     }
 }

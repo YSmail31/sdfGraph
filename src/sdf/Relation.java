@@ -8,10 +8,18 @@ package sdf;
 public class Relation {
     private Paintable parent;
     private Paintable child;
-
+    private String rateSrc,rateDst;
+    
     public Relation(Paintable parent, Paintable child) {
         this.parent = parent;
         this.child = child;
+    }
+
+    public Relation(Paintable parent, Paintable child, String rateSrc, String rateDst) {
+        this.parent = parent;
+        this.child = child;
+        this.rateSrc = rateSrc;
+        this.rateDst = rateDst;
     }
 
     public Paintable getChild() {
@@ -22,4 +30,13 @@ public class Relation {
         return parent;
     }
 
+    public String getRateSrc() {
+        return rateSrc;
+    }
+
+    public String getRateDst() {
+        return rateDst;
+    }
+    
+    
 }
